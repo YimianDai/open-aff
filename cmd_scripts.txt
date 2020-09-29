@@ -1,0 +1,25 @@
+
+Before, you might need to run `export MXNET_SAFE_ACCUMULATION=1`
+
+
+### ResNet-50-AFF - ImageNet
+
+python train_imagenet.py --askc-type ASKCFuse --mixup --mode hybrid --lr 0.075 --lr-mode cosine --num-epochs 180 --batch-size 128 --num-gpus 2 -j 48 --warmup-epochs 5 --dtype float16 --use-rec --last-gamma --no-wd --label-smoothing --save-dir params_resnet50_v1b_best_AFF --logging-file resnet50_v1b_best_AFF.log
+
+
+### ResNet-50-iAFF - ImageNet
+
+python train_imagenet.py --askc-type ResGlobLocaforGlobLocaCha --mixup --mode hybrid --lr 0.075 --lr-mode cosine --num-epochs 180 --batch-size 128 --num-gpus 2 -j 48 --warmup-epochs 5 --dtype float16 --use-rec --last-gamma --no-wd --label-smoothing --save-dir params_resnet50_v1b_best_iAFF --logging-file resnet50_v1b_best_iAFF.log
+
+### resnext50_32x4d_aff - ImageNet
+
+python train_imagenet.py --askc-type ASKCFuse --model resnext50_32x4d_askc --mode hybrid --lr 0.075 --lr-mode cosine --num-epochs 240 --batch-size 128 --num-gpus 2 -j 48 --use-rec --dtype float16 --warmup-epochs 5 --last-gamma --no-wd --label-smoothing --mixup --save-dir params_resnext50_32x4d_askc_best --logging-file resnext50_32x4d_askc_best.log
+
+### ResNet32_aff - cifar
+
+python train_cifar.py --model resnet --dataset cifar100 --blocks 5 --channel-times 4 --gpus 0 --start-layer 1 --num-epochs 400 --mode hybrid -j 2 --batch-size 128 --wd 0.0001 --lr 0.2 --lr-decay 0.1 --lr-decay-epoch 300,350
+
+### resnext38_32x4d - cifar
+
+python train_cifar.py --model resnext38_32x4d --dataset cifar100 --gpus 0,1,2 --num-epochs 640 --mode hybrid -j 28 --batch-size 128 --wd 0.0001 --lr 0.2 --lr-decay 0.1 --lr-decay-epoch 300,450
+
