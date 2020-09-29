@@ -31,8 +31,8 @@ The training commands / shell scripts are in `cmd_scripts.txt`
 | PyramidNet-272-alpha-200 <a id="8">[8]</a>              | 26.0M    | 83.6        |
 | Neural Architecture Transfer (NAT-M4) <a id="9">[9]</a> | 9.0M     | 88.3        |
 | AutoAugment+PyramidNet+ShakeDrop <a id="10">[10]</a>    | 26.0M    | 89.3        |
-| AFF-ResNet-32 (**ours**)                                | **5.0M** | **89.3**    |
-| AFF-ResNeXt-38-32x4d (**ours**)                         | **7.8M** | **90.3**    |
+| **AFF-ResNet-32 (ours)**                                | **5.0M** | **89.3**    |
+| **AFF-ResNeXt-38-32x4d (ours)**                         | **7.8M** | **90.3**    |
 
 ###  ImageNet
 
@@ -44,10 +44,10 @@ The training commands / shell scripts are in `cmd_scripts.txt`
 | SENet-101 [[4]](#4)                             | 49.4M     | 20.9        |
 | Gather-Excite-$\theta^{+}$-ResNet-101 [[5]](#5) | 58.4M     | 20.7        |
 | Local-Importance-Pooling-ResNet-101 [[6]](#6)   | 42.9M     | 20.7        |
-| AFF-ResNet-50 (**ours**)                        | **30.3M** | **20.9**    |
-| AFF-ResNeXt-50-32x4d (**ours**)                 | **29.9M** | **20.8**    |
-| iAFF-ResNet-50 (**ours**)                       | **35.1M** | **20.4**    |
-| iAFF-ResNeXt-50-32x4d (**ours**)                | **34.7M** | **20.2**    |
+| **AFF-ResNet-50 (ours)**                        | **30.3M** | **20.9**    |
+| **AFF-ResNeXt-50-32x4d (ours)**                 | **29.9M** | **20.8**    |
+| **iAFF-ResNet-50 (ours)**                       | **35.1M** | **20.4**    |
+| **iAFF-ResNeXt-50-32x4d (ours)**                | **34.7M** | **20.2**    |
 
 <img src=https://raw.githubusercontent.com/YimianDai/imgbed/master/github/aff/Localization_Reduced.jpg width=100%>
 <img src=https://raw.githubusercontent.com/YimianDai/imgbed/master/github/aff/SmallObject_Reduced.jpg width=100%>
