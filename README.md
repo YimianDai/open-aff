@@ -17,35 +17,24 @@ pip install --upgrade mxnet-cu100 gluoncv
 
 ## Experiments 
 
-**All trained model params and training logs are in `./params`**
+All trained model params and training logs are in `./params`
 
-### AFF-ResNet-50 on ImageNet
+The training commands / shell scripts are in `cmd_scripts.txt`
 
-Training script:
-```python
-python train_imagenet.py --askc-type ASKCFuse --mixup --mode hybrid --lr 0.075 --lr-mode cosine --num-epochs 180 --batch-size 128 --num-gpus 2 -j 48 --warmup-epochs 5 --dtype float16 --use-rec --last-gamma --no-wd --label-smoothing --save-dir params_resnet50_v1b_best_AFF --logging-file resnet50_v1b_best_AFF.log
-```
+### CIFAR-100
 
-### iAFF-ResNet-50 on ImageNet
+| Architecture                                            | Params   | Accuracy    |
+| --------                                                | -------  | ----------- |
+| Attention-Augmented-Wide-ResNet-28-10 <a id="3">[3]</a> | 36.2M    | 81.6        |
+| SENet-29 <a id="4">[4]</a>                              | 35.0M    | 82.2        |
+| SKNet-29  <a id="7">[7]</a>                             | 27.7M    | 82.7        |
+| PyramidNet-272-alpha-200 <a id="8">[8]</a>              | 26.0M    | 83.6        |
+| Neural Architecture Transfer (NAT-M4) <a id="9">[9]</a> | 9.0M     | 88.3        |
+| AutoAugment+PyramidNet+ShakeDrop <a id="10">[10]</a>    | 26.0M    | 89.3        |
+| AFF-ResNet-32 (**ours**)                                | **5.0M** | **89.3**    |
+| AFF-ResNeXt-38-32x4d (**ours**)                         | **7.8M** | **90.3**    |
 
-Training script:
-```python
-python train_imagenet.py --askc-type ResGlobLocaforGlobLocaCha --mixup --mode hybrid --lr 0.075 --lr-mode cosine --num-epochs 180 --batch-size 128 --num-gpus 2 -j 48 --warmup-epochs 5 --dtype float16 --use-rec --last-gamma --no-wd --label-smoothing --save-dir params_resnet50_v1b_best_iAFF --logging-file resnet50_v1b_best_iAFF.log
-```
-
-### AFF-ResNeXt-50-32x4d on ImageNet
-
-Training script:
-```python
-python train_imagenet.py --askc-type ASKCFuse --model resnext50_32x4d_askc --mode hybrid --lr 0.075 --lr-mode cosine --num-epochs 240 --batch-size 128 --num-gpus 2 -j 48 --use-rec --dtype float16 --warmup-epochs 5 --last-gamma --no-wd --label-smoothing --mixup --save-dir params_resnext50_32x4d_aff_best --logging-file resnext50_32x4d_aff_best.log
-```
-
-### iAFF-ResNeXt-50-32x4d on ImageNet
-
-Training script:
-```python
-python train_imagenet.py --askc-type ResGlobLocaforGlobLocaCha --model resnext50_32x4d_askc --mode hybrid --lr 0.075 --lr-mode cosine --num-epochs 240 --batch-size 128 --num-gpus 2 -j 48 --use-rec --dtype float16 --warmup-epochs 5 --last-gamma --no-wd --label-smoothing --mixup --save-dir params_resnext50_32x4d_iaff_best --logging-file resnext50_32x4d_iaff_best.log
-```
+###  ImageNet
 
 | Architecture                                    | Params    | top-1 err.  |
 | --------                                        | -------   | ----------- |
@@ -60,31 +49,8 @@ python train_imagenet.py --askc-type ResGlobLocaforGlobLocaCha --model resnext50
 | iAFF-ResNet-50 (**ours**)                       | **35.1M** | **20.4**    |
 | iAFF-ResNeXt-50-32x4d (**ours**)                | **34.7M** | **20.2**    |
 
-### Aff-ResNet-32 on CIFAR-100
-
-Training script:
-```python
-python train_cifar.py --model resnet --dataset cifar100 --blocks 5 --channel-times 4 --gpus 0 --start-layer 1 --num-epochs 400 --mode hybrid -j 2 --batch-size 128 --wd 0.0001 --lr 0.2 --lr-decay 0.1 --lr-decay-epoch 300,350
-```
-
-### Aff-ResNeXt-38-32x4d on CIFAR-100
-
-Training script:
-```python
-python train_cifar.py --model resnext38_32x4d --dataset cifar100 --gpus 0,1,2 --num-epochs 640 --mode hybrid -j 28 --batch-size 128 --wd 0.0001 --lr 0.2 --lr-decay 0.1 --lr-decay-epoch 300,450
-```
-
-
-| Architecture                                            | Params   | Accuracy    |
-| --------                                                | -------  | ----------- |
-| Attention-Augmented-Wide-ResNet-28-10 <a id="3">[3]</a> | 36.2M    | 81.6        |
-| SENet-29 <a id="4">[4]</a>                              | 35.0M    | 82.2        |
-| SKNet-29  <a id="7">[7]</a>                             | 27.7M    | 82.7        |
-| PyramidNet-272-alpha-200 <a id="8">[8]</a>              | 26.0M    | 83.6        |
-| Neural Architecture Transfer (NAT-M4) <a id="9">[9]</a> | 9.0M     | 88.3        |
-| AutoAugment+PyramidNet+ShakeDrop <a id="10">[10]</a>    | 26.0M    | 89.3        |
-| AFF-ResNet-32 (**ours**)                                | **5.0M** | **89.3**    |
-| AFF-ResNeXt-38-32x4d (**ours**)                         | **7.8M** | **90.3**    |
+<img src=https://raw.githubusercontent.com/YimianDai/imgbed/master/github/aff/Localization_Reduced.jpg width=100%>
+<img src=https://raw.githubusercontent.com/YimianDai/imgbed/master/github/aff/SmallObject_Reduced.jpg width=100%>
 
 
 
