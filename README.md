@@ -1,7 +1,7 @@
 Attentional Feature Fusion
 ==============
 
-MXNet/Gluon code for "Attentional Feature Fusion" <>
+MXNet/Gluon code for "Attentional Feature Fusion" <https://arxiv.org/abs/2009.14082>
 
 What's in this repo so far:
 
