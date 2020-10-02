@@ -13,7 +13,8 @@ To Do:
 
 * ResNeXt code needs to be able to automatically choose number of attentional layers to avoid manually setting 
 * ResNeXt47 on CIFAR-100 needs to re-run to see whether the accuracy could be higher
-* Run ImageNet experiments with a higher number of attentional layers and a deeper backbone   
+* Run ImageNet experiments with a higher number of attentional layers and a deeper backbone
+* Rename the function name, e.g., ResNet110V2ASKC => ResNet20V2ASKC  
  
 ## Requirements
  
