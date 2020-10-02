@@ -23,16 +23,16 @@ The training commands / shell scripts are in `cmd_scripts.txt`
 
 ### CIFAR-100
 
-| Architecture                                            | Params   | Accuracy    |
-| --------                                                | -------  | ----------- |
-| Attention-Augmented-Wide-ResNet-28-10 <a id="3">[3]</a> | 36.2M    | 81.6        |
-| SENet-29 <a id="4">[4]</a>                              | 35.0M    | 82.2        |
-| SKNet-29  <a id="7">[7]</a>                             | 27.7M    | 82.7        |
-| PyramidNet-272-alpha-200 <a id="8">[8]</a>              | 26.0M    | 83.6        |
-| Neural Architecture Transfer (NAT-M4) <a id="9">[9]</a> | 9.0M     | 88.3        |
-| AutoAugment+PyramidNet+ShakeDrop <a id="10">[10]</a>    | 26.0M    | 89.3        |
-| **AFF-ResNet-32 (ours)**                                | **5.0M** | **89.3**    |
-| **AFF-ResNeXt-38-32x4d (ours)**                         | **7.8M** | **90.3**    |
+| Architecture                                    | Params   | Accuracy    |
+| --------                                        | -------  | ----------- |
+| Attention-Augmented-Wide-ResNet-28-10 [[3]](#3) | 36.2M    | 81.6        |
+| SENet-29 [[4]](#4)                              | 35.0M    | 82.2        |
+| SKNet-29  [[7]](#7)                             | 27.7M    | 82.7        |
+| PyramidNet-272-alpha-200 [[8]](#8)              | 26.0M    | 83.6        |
+| Neural Architecture Transfer (NAT-M4) [[9]](#9) | 9.0M     | 88.3        |
+| AutoAugment+PyramidNet+ShakeDrop [[10]](#10)    | 26.0M    | 89.3        |
+| **AFF-ResNet-32 (ours)**                        | **5.0M** | **89.3**    |
+| **AFF-ResNeXt-38-32x4d (ours)**                 | **7.8M** | **90.3**    |
 
 ###  ImageNet
 
