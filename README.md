@@ -1,3 +1,5 @@
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/attentional-feature-fusion/image-classification-on-cifar-100)](https://paperswithcode.com/sota/image-classification-on-cifar-100?p=attentional-feature-fusion)
+
 Attentional Feature Fusion
 ==============
 
