@@ -9,6 +9,12 @@ What's in this repo so far:
 
  * Code, trained models, and training logs for CIFAR-10, CIFAR-100, and ImageNet
  
+To Do:
+
+* ResNeXt code needs to be able to automatically choose number of attentional layers to avoid manually setting 
+* ResNeXt47 on CIFAR-100 needs to re-run to see whether the accuracy could be higher
+* Run ImageNet experiments with a higher number of attentional layers and a deeper backbone   
+ 
 ## Requirements
  
 Install [MXNet](https://mxnet.apache.org/) and [Gluon-CV](https://gluon-cv.mxnet.io/):
