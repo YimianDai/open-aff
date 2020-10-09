@@ -22,6 +22,7 @@ What's in this repo so far:
 **To Do:**
 
 * Running AFF-ResNeXt-50 and AFF-ResNet-50 on ImageNet
+* Update Grad-CAM results on new trained models
 * Re-implement the segmentation code
 * Convert to PyTorch
 
