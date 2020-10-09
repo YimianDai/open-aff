@@ -58,14 +58,15 @@ The training commands / shell scripts are in `cmd_scripts.txt`
 
 | Architecture                                    | Params   | Accuracy    |
 | --------                                        | -------  | ----------- |
-| Attention-Augmented-Wide-ResNet-28-10 [[3]](#3) | 36.2M    | 81.6        |
-| SENet-29 [[4]](#4)                              | 35.0M    | 82.2        |
-| SKNet-29  [[7]](#7)                             | 27.7M    | 82.7        |
-| PyramidNet-272-alpha-200 [[8]](#8)              | 26.0M    | 83.6        |
-| Neural Architecture Transfer (NAT-M4) [[9]](#9) | 9.0M     | 88.3        |
-| AutoAugment+PyramidNet+ShakeDrop [[10]](#10)    | 26.0M    | 89.3        |
-| **AFF-ResNeXt-38-32x4d (ours)**                 | **7.8M** | **91.2**    |
-| **AFF-ResNeXt-47-32x4d (ours)**                 | **9.7M** | **91.8**    |
+| Attention-Augmented-Wide-ResNet-28-10 [[3]](#3) | 36.2M    | 81.6     |
+| SENet-29 [[4]](#4)                              | 35.0M    | 82.2     |
+| SKNet-29  [[7]](#7)                             | 27.7M    | 82.7     |
+| PyramidNet-272-alpha-200 [[8]](#8)              | 26.0M    | 83.6     |
+| Neural Architecture Transfer (NAT-M4) [[9]](#9) | 9.0M     | 88.3     |
+| AutoAugment+PyramidNet+ShakeDrop [[10]](#10)    | 26.0M    | 89.3     |
+| **AFF-ResNet-32**                               | **7.9M** | **90.8** |
+| **AFF-ResNeXt-38-32x4d (ours)**                 | **7.8M** | **91.2** |
+| **AFF-ResNeXt-47-32x4d (ours)**                 | **9.7M** | **91.8** |
 
 ###  ImageNet
 
@@ -77,9 +78,10 @@ The training commands / shell scripts are in `cmd_scripts.txt`
 | SENet-101 [[4]](#4)                             | 49.4M     | 20.9        |
 | Gather-Excite-$\theta^{+}$-ResNet-101 [[5]](#5) | 58.4M     | 20.7        |
 | Local-Importance-Pooling-ResNet-101 [[6]](#6)   | 42.9M     | 20.7        |
+| **iAFF-ResNet-50 (ours)**                       | **35.1M** | **20.2**    |
+
 <!-- | **AFF-ResNet-50 (ours)**                        | **30.3M** | **20.9**    |
 | **AFF-ResNeXt-50-32x4d (ours)**                 | **29.9M** | **20.8**    | -->
-| **iAFF-ResNet-50 (ours)**                       | **35.1M** | **20.2**    |
 <!-- | **iAFF-ResNeXt-50-32x4d (ours)**                | **34.7M** | **19.8**    | -->
 
 <img src=https://raw.githubusercontent.com/YimianDai/imgbed/master/github/aff/Localization_Reduced.jpg width=100%>
