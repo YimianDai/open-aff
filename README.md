@@ -12,7 +12,7 @@ What's in this repo so far:
 **PS:**
 
 * If you are the reviewers of our submitted paper, please note that the accuracy of current implementation is a bit higher than the accuracy in the paper because it is a new implementation with a bag of tricks.
-* 如果您是我的学位论文评审专家，发现论文与这个 repo 的数字有些出入，那是因为在论文提交后我又将代码重新实现了一遍，添加了 AutoAugment、Label Smooting 这些些技巧，所以目前这个 repo 中的分类准确率会比论文中的数字高一些，还请见谅。
+* 如果您是我的学位论文评审专家，发现论文与这个 repo 的数字有些出入，那是因为在论文提交后我又将代码重新实现了一遍，添加了 AutoAugment、Label Smooting 这些技巧，所以目前这个 repo 中的分类准确率会比论文中的数字高一些，还请见谅。
 
 **Change Logs:**
 
