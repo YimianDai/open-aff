@@ -1,16 +1,20 @@
 import argparse, time, logging, os, math, sys
 
 import numpy as np
+from PIL import Image
+
 import mxnet as mx
-import gluoncv as gcv
 from mxnet import gluon, nd
 from mxnet import autograd as ag
 from mxnet.gluon.data.vision import transforms
+
+import gluoncv as gcv
 from gluoncv.data import imagenet
 from gluoncv.model_zoo import get_model
 from gluoncv.utils import makedirs, LRSequential, LRScheduler
 
-from model import ResNet50_v1bASKC, ResNextASKC
+
+from model import AFFResNet, AFFResNeXt
 from utils import summary
 gcv.utils.check_version('0.6.0')
 
@@ -32,31 +36,29 @@ def parse_args():
                         help='use image record iter for data input. default is false.')
     parser.add_argument('--summary', action='store_true',
                         help='print parameters')
-    parser.add_argument('--batch-size', type=int, default=32,
+    parser.add_argument('--batch-size', type=int, default=128,
                         help='training batch size per device (CPU/GPU).')
-    parser.add_argument('--r', type=int, default=4,
+    parser.add_argument('--r', type=int, default=16,
                         help='channel reduction ratio')
-    parser.add_argument('--dtype', type=str, default='float32',
-                        help='data type for training. default is float32')
-
-    parser.add_argument('--scenario', type=str, default='xxx',
-                        help='ResNet, ResNeXt')
+    parser.add_argument('--dtype', type=str, default='float16',
+                        help='data type for training. default is float16')
+    parser.add_argument('--model', type=str, default='xxx',
+                        help='resnet, resnext')
     parser.add_argument('--askc-type', type=str, default='xxx',
-                        help='ASKCFuse, ResLocaLocaCha, ResGlobGlobCha')
-
-    parser.add_argument('--num-gpus', type=int, default=0,
+                        help='ASKCFuse, ResGlobLocaforGlobLocaCha')
+    parser.add_argument('--num-gpus', type=int, default=4,
                         help='number of gpus to use.')
-    parser.add_argument('-j', '--num-data-workers', dest='num_workers', default=4, type=int,
+    parser.add_argument('-j', '--num-data-workers', dest='num_workers', default=96, type=int,
                         help='number of preprocessing workers')
-    parser.add_argument('--num-epochs', type=int, default=3,
+    parser.add_argument('--num-epochs', type=int, default=240,
                         help='number of training epochs.')
-    parser.add_argument('--lr', type=float, default=0.1,
+    parser.add_argument('--lr', type=float, default=0.075,
                         help='learning rate. default is 0.1.')
     parser.add_argument('--momentum', type=float, default=0.9,
                         help='momentum value for optimizer, default is 0.9.')
     parser.add_argument('--wd', type=float, default=0.0001,
                         help='weight decay rate. default is 0.0001.')
-    parser.add_argument('--lr-mode', type=str, default='step',
+    parser.add_argument('--lr-mode', type=str, default='cosine',
                         help='learning rate scheduler mode. options are step, poly and cosine.')
     parser.add_argument('--lr-decay', type=float, default=0.1,
                         help='decay rate of learning rate. default is 0.1.')
@@ -66,14 +68,12 @@ def parse_args():
                         help='epochs at which learning rate decays. default is 40,60.')
     parser.add_argument('--warmup-lr', type=float, default=0.0,
                         help='starting warmup learning rate. default is 0.0.')
-    parser.add_argument('--warmup-epochs', type=int, default=0,
+    parser.add_argument('--warmup-epochs', type=int, default=5,
                         help='number of warmup epochs.')
     parser.add_argument('--last-gamma', action='store_true',
                         help='whether to init gamma of the last BN layer in each bottleneck to 0.')
-    parser.add_argument('--mode', type=str,
+    parser.add_argument('--mode', type=str, default='hybrid',
                         help='mode in which to train the model. options are symbolic, imperative, hybrid')
-    # parser.add_argument('--model', type=str, required=True,
-                        # help='type of model to use. see vision_model for options.')
     parser.add_argument('--input-size', type=int, default=224,
                         help='size of the input image size. default is 224')
     parser.add_argument('--crop-ratio', type=float, default=0.875,
@@ -86,7 +86,7 @@ def parse_args():
                         help='whether train the model with mix-up. default is false.')
     parser.add_argument('--mixup-alpha', type=float, default=0.2,
                         help='beta distribution parameter for mixup sampling, default is 0.2.')
-    parser.add_argument('--mixup-off-epoch', type=int, default=0,
+    parser.add_argument('--mixup-off-epoch', type=int, default=5,
                         help='how many last epochs to train without mixup, default is 0.')
     parser.add_argument('--label-smoothing', action='store_true',
                         help='use label smoothing or not in training. default is false.')
@@ -116,6 +116,12 @@ def parse_args():
                         help='name of training log file')
     parser.add_argument('--use-gn', action='store_true',
                         help='whether to use group norm.')
+    parser.add_argument('--auto_aug', action='store_true',
+                        help='use auto_aug. default is false.')
+    parser.add_argument('--start-layer', type=int, default=3,
+                        help='1, 2, 3, 4(no attention)')
+    parser.add_argument('--num-layer', type=int, default=50,
+                        help='50, 101, 152')
     opt = parser.parse_args()
     return opt
 
@@ -161,15 +167,7 @@ def main():
                     step_factor=lr_decay, power=2)
     ])
 
-    # model_name = opt.model
-
     kwargs = {'ctx': context, 'pretrained': opt.use_pretrained, 'classes': classes}
-    # if opt.use_gn:
-    #     kwargs['norm_layer'] = gcv.nn.GroupNorm
-    # if model_name.startswith('vgg'):
-    #     kwargs['batch_norm'] = opt.batch_norm
-    # elif model_name.startswith('resnext'):
-    #     kwargs['use_se'] = opt.use_se
 
     if opt.last_gamma:
         kwargs['last_gamma'] = True
@@ -179,42 +177,29 @@ def main():
     if opt.dtype != 'float32':
         optimizer_params['multi_precision'] = True
 
-    scenario = opt.scenario  # ATAC, DyReF, ASKC
-    print("scenario: ", scenario)
-
-    if opt.scenario == 'ResNet':
-        # DirectAdd, Concat, ResLocaCha, ResGlobCha,
-        # ResLocaLocaCha, ResGlobGlobCha, ResGlobLocaCha
-        # ResGlobforGlobCha, ResLocaforLocaCha, ResGlobLocaforGlobLocaCha
-        # AYforXplusY, XplusAYforY, AXYforXplusY, AXYforXY
-        # SEFuse, GAUFuse, SKFuse, ASKCFuse, RASKCFuse,
-        # ConcatASKC
-        # askc_type = 'ResLocaLocaCha'
-        askc_type = opt.askc_type
-        print('askc_type: ', askc_type)
+    askc_type = opt.askc_type
+    start_layer = opt.start_layer
+    if opt.num_layer == 50:
         layers = [3, 4, 6, 3]
+    elif opt.num_layer == 101:
+        layers = [3, 4, 23, 3]
+    elif opt.num_layer == 152:
+        layers = [3, 4, 36, 3]
+    else:
+        raise ValueError('Unknown opt.num_layer')
+    cardinality = 32
+    bottleneck_width = 4
 
-        net = ResNet50_v1bASKC(askc_type=askc_type, layers=layers, **kwargs)
-        model_name = "ResNet50_v1bASKC-" + opt.askc_type
+    model_prefix = 'ImageNet-' + askc_type
+    model_suffix = '-' + str(opt.num_layer) + '-s-' + str(opt.start_layer)
+    if opt.model == 'resnet':
+        net = AFFResNet(askc_type=askc_type, start_layer=start_layer, layers=layers, **kwargs)
+        model_name = model_prefix + '-resnet-' + model_suffix
 
-
-    elif opt.scenario == 'ResNeXt':
-        # DirectAdd, Concat, ResLocaCha, ResGlobCha,
-        # ResLocaLocaCha, ResGlobGlobCha, ResGlobLocaCha
-        # ResGlobforGlobCha, ResLocaforLocaCha, ResGlobLocaforGlobLocaCha
-        # AYforXplusY, XplusAYforY, AXYforXplusY, AXYforXY
-        # SEFuse, GAUFuse, SKFuse, ASKCFuse, RASKCFuse,
-        # ConcatASKC
-        # askc_type = 'ResLocaLocaCha'
-        askc_type = opt.askc_type
-        layers = [3, 4, 6, 3]
-        cardinality = 32
-        bottleneck_width = 4
-        use_se = opt.use_se
-        net = ResNextASKC(askc_type, layers, cardinality, bottleneck_width, use_se=use_se)
-        model_name = "ResNeXt-50-32x4d-ASKC-" + opt.askc_type
-        print("askc_type: ", askc_type)
-        print("use_se: ", use_se)
+    elif opt.model == 'resnext':
+        net = AFFResNeXt(askc_type, start_layer, layers, cardinality, bottleneck_width,
+                         use_se=False)
+        model_name = model_prefix + '-resnext-' + model_suffix
 
     net.cast(opt.dtype)
     if opt.resume_params != '':
@@ -304,25 +289,59 @@ def main():
             label = gluon.utils.split_and_load(batch[1], ctx_list=ctx, batch_axis=0)
             return data, label
 
-        transform_train = transforms.Compose([
-            transforms.RandomResizedCrop(input_size),
-            transforms.RandomFlipLeftRight(),
-            transforms.RandomColorJitter(brightness=jitter_param, contrast=jitter_param,
-                                        saturation=jitter_param),
-            transforms.RandomLighting(lighting_param),
-            transforms.ToTensor(),
-            normalize
-        ])
-        transform_test = transforms.Compose([
-            transforms.Resize(resize, keep_ratio=True),
-            transforms.CenterCrop(input_size),
-            transforms.ToTensor(),
-            normalize
-        ])
+        transform_train = []
+        if opt.auto_aug:
+            print('Using AutoAugment')
+            from autogluon.utils.augment import AugmentationBlock, autoaug_imagenet_policies
+            transform_train.append(AugmentationBlock(autoaug_imagenet_policies()))
+
+        from gluoncv.utils.transforms import EfficientNetRandomCrop, EfficientNetCenterCrop
+        from autogluon.utils import pil_transforms
+
+        if input_size >= 320:
+            transform_train.extend([
+                EfficientNetRandomCrop(input_size),
+                pil_transforms.Resize((input_size, input_size), interpolation=Image.BICUBIC),
+                pil_transforms.RandomHorizontalFlip(),
+                pil_transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4),
+                transforms.RandomLighting(lighting_param),
+                transforms.ToTensor(),
+                transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            ])
+        else:
+            transform_train.extend([
+                transforms.RandomResizedCrop(input_size),
+                transforms.RandomFlipLeftRight(),
+                transforms.RandomColorJitter(brightness=jitter_param, contrast=jitter_param,
+                                             saturation=jitter_param),
+                transforms.RandomLighting(lighting_param),
+                transforms.ToTensor(),
+                transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            ])
+
+        transform_train = transforms.Compose(transform_train)
 
         train_data = gluon.data.DataLoader(
             imagenet.classification.ImageNet(data_dir, train=True).transform_first(transform_train),
             batch_size=batch_size, shuffle=True, last_batch='discard', num_workers=num_workers)
+
+        if input_size >= 320:
+            transform_test = transforms.Compose([
+                pil_transforms.ToPIL(),
+                EfficientNetCenterCrop(input_size),
+                pil_transforms.Resize((input_size, input_size), interpolation=Image.BICUBIC),
+                pil_transforms.ToNDArray(),
+                transforms.ToTensor(),
+                normalize
+            ])
+        else:
+            transform_test = transforms.Compose([
+                transforms.Resize(resize, keep_ratio=True),
+                transforms.CenterCrop(input_size),
+                transforms.ToTensor(),
+                normalize
+            ])
+
         val_data = gluon.data.DataLoader(
             imagenet.classification.ImageNet(data_dir, train=False).transform_first(transform_test),
             batch_size=batch_size, shuffle=False, num_workers=num_workers)
@@ -410,8 +429,8 @@ def main():
             sparse_label_loss = True
         if distillation:
             L = gcv.loss.DistillationSoftmaxCrossEntropyLoss(temperature=opt.temperature,
-                                                                 hard_weight=opt.hard_weight,
-                                                                 sparse_label=sparse_label_loss)
+                                                             hard_weight=opt.hard_weight,
+                                                             sparse_label=sparse_label_loss)
         else:
             L = gluon.loss.SoftmaxCrossEntropyLoss(sparse_label=sparse_label_loss)
 

@@ -4,11 +4,7 @@ import math
 from mxnet.gluon.block import HybridBlock
 from mxnet.gluon import nn
 from mxnet.gluon.nn import BatchNorm
-from .fusion import DirectAddFuse, ConcatFuse, ResGlobChaFuse, ResLocaChaFuse, \
-    ResGlobLocaChaFuse, ResLocaLocaChaFuse, ResGlobGlobChaFuse, ResGlobforGlobChaFuse, \
-    ResLocaforLocaChaFuse, ResGlobLocaforGlobLocaChaFuse, AYforXplusYAddFuse, XplusAYforYAddFuse, \
-    AXYforXplusYAddFuse, AXYforXYAddFuse, SEFuse, GAUFuse, ASKCFuse, RASKCFuse, ConcatASKC, SKFuse, \
-    TwoConcatASKC, AddReLUASKCFuse, HalfASKCFuse, ConcatASKCFuse, DepthASKCFuse, Depth4ASKCFuse
+from .fusion import DirectAddFuse, ASKCFuse, ResGlobLocaforGlobLocaChaFuse
 
 
 def _conv3x3(channels, stride, in_channels):
@@ -16,10 +12,10 @@ def _conv3x3(channels, stride, in_channels):
                      use_bias=False, in_channels=in_channels)
 
 
-class ResBlockV2ASKC(HybridBlock):
-    def __init__(self, askc_mode, channels, stride, downsample=False, in_channels=0,
-                 asBackbone=False, norm_layer=BatchNorm, norm_kwargs=None, **kwargs):
-        super(ResBlockV2ASKC, self).__init__(**kwargs)
+class AFFResBlockV2(HybridBlock):
+    def __init__(self, askc_type, channels, stride, downsample=False, in_channels=0,
+                 norm_layer=BatchNorm, norm_kwargs=None, **kwargs):
+        super(AFFResBlockV2, self).__init__(**kwargs)
 
         self.resfwd = nn.HybridSequential(prefix='resfwd')
         self.resfwd.add(norm_layer(**({} if norm_kwargs is None else norm_kwargs)))
@@ -31,71 +27,19 @@ class ResBlockV2ASKC(HybridBlock):
 
         self.downsample = nn.HybridSequential(prefix='downsample')
         if downsample:
-            self.downsample.add(nn.Conv2D(channels, 1, stride, use_bias=False,
-                                        in_channels=in_channels))
-        # else:
-        #     self.downsample = None
+            self.downsample.add(nn.AvgPool2D(pool_size=stride, strides=stride,
+                                             ceil_mode=True, count_include_pad=False))
+            self.downsample.add(nn.Conv2D(channels, kernel_size=1, strides=1,
+                                          use_bias=False, in_channels=in_channels))
 
-        if askc_mode == 'DirectAdd':
+        if askc_type == 'DirectAdd':
             self.attention = DirectAddFuse()
-        elif askc_mode == 'Concat':
-            self.attention = ConcatFuse(channels=channels)
-        elif askc_mode == 'ResGlobCha':
-            self.attention = ResGlobChaFuse(channels=channels, asBackbone=asBackbone)
-        elif askc_mode == 'ResLocaCha':
-            self.attention = ResLocaChaFuse(channels=channels, asBackbone=asBackbone)
-        elif askc_mode == 'ResGlobLocaCha':
-            self.attention = ResGlobLocaChaFuse(channels=channels)
-        elif askc_mode == 'ResLocalLocaCha':
-            self.attention = ResLocaLocaChaFuse(channels=channels)
-        elif askc_mode == 'ResGlobGlobCha':
-            self.attention = ResGlobGlobChaFuse(channels=channels)
-        elif askc_mode == 'ResGlobforGlobCha':
-            self.attention = ResGlobforGlobChaFuse(channels=channels)
-        elif askc_mode == 'ResLocaforLocaCha':
-            self.attention = ResLocaforLocaChaFuse(channels=channels)
-        elif askc_mode == 'ResGlobLocaforGlobLocaCha':
+        elif askc_type == 'ResGlobLocaforGlobLocaCha':
             self.attention = ResGlobLocaforGlobLocaChaFuse(channels=channels)
-        # A(Y)*X + Y
-        elif askc_mode == 'AYforXplusY':
-            self.attention = AYforXplusYAddFuse(channels=channels)
-        # X + A(Y)*Y
-        elif askc_mode == 'XplusAYforY':
-            self.attention = XplusAYforYAddFuse(channels=channels)
-        # A(X+Y)*X + Y
-        elif askc_mode == 'AXYforXplusY':
-            self.attention = AXYforXplusYAddFuse(channels=channels)
-        # A(X+Y) * (X+Y)
-        elif askc_mode == 'AXYforXY':
-            self.attention = AXYforXYAddFuse(channels=channels)
-        elif askc_mode == 'SEFuse':
-            self.attention = SEFuse(channels=channels)
-        elif askc_mode == 'GAUFuse':
-            self.attention = GAUFuse(channels=channels)
-        elif askc_mode == 'ASKCFuse':
+        elif askc_type == 'ASKCFuse':
             self.attention = ASKCFuse(channels=channels)
-        elif askc_mode == 'HalfASKCFuse':
-            self.attention = HalfASKCFuse(channels=channels)
-        elif askc_mode == 'DepthASKCFuse':
-            self.attention = DepthASKCFuse(channels=channels)
-
-        elif askc_mode == 'Depth4ASKCFuse':
-            self.attention = Depth4ASKCFuse(channels=channels)
-
-        elif askc_mode == 'AddReLUASKCFuse':
-            self.attention = AddReLUASKCFuse(channels=channels)
-        elif askc_mode == 'ConcatASKCFuse':
-            self.attention = ConcatASKCFuse(channels=channels)
-        elif askc_mode == 'RASKCFuse':
-            self.attention = RASKCFuse(channels=channels)
-        elif askc_mode == 'SKFuse':
-            self.attention = SKFuse(channels=channels)
-        elif askc_mode == 'ConcatASKC':
-            self.attention = ConcatASKC(channels=channels)
-        elif askc_mode == 'TwoConcatASKC':
-            self.attention = TwoConcatASKC(channels=channels)
         else:
-            raise ValueError('Unknown askc_mode')
+            raise ValueError('Unknown askc_type')
 
     def hybrid_forward(self, F, x):
         """Hybrid forward"""
@@ -110,7 +54,7 @@ class ResBlockV2ASKC(HybridBlock):
         return xo
 
 
-class BottleneckV1bASKC(HybridBlock):
+class AFFBottleneck(HybridBlock):
     """ResNetV1b BottleneckV1b
     """
     # pylint: disable=unused-argument
@@ -118,7 +62,7 @@ class BottleneckV1bASKC(HybridBlock):
     def __init__(self, askc_type, planes, strides=1, dilation=1,
                  downsample=None, previous_dilation=1, norm_layer=None,
                  norm_kwargs=None, last_gamma=False, **kwargs):
-        super(BottleneckV1bASKC, self).__init__()
+        super(AFFBottleneck, self).__init__()
         norm_kwargs = norm_kwargs if norm_kwargs is not None else {}
         self.conv1 = nn.Conv2D(channels=planes, kernel_size=1,
                                use_bias=False)
@@ -142,20 +86,14 @@ class BottleneckV1bASKC(HybridBlock):
         self.dilation = dilation
         self.strides = strides
 
-        if askc_type == 'ASKCFuse':
-            self.attention = ASKCFuse(channels=planes*4, r=16)
-        elif askc_type == 'SEFuse':
-            self.attention = SEFuse(channels=planes*4, r=16)
+        if askc_type == 'DirectAdd':
+            self.attention = DirectAddFuse()
         elif askc_type == 'ResGlobLocaforGlobLocaCha':
             self.attention = ResGlobLocaforGlobLocaChaFuse(channels=planes*4, r=16)
-        elif askc_type == 'ResGlobGlobCha':
-            self.attention = ResGlobGlobChaFuse(channels=planes*4, r=16)
-        elif askc_type == 'ResLocaLocaCha':
-            self.attention = ResLocaLocaChaFuse(channels=planes*4, r=16)
-        elif askc_type == 'DirectAdd':
-            self.attention = DirectAddFuse()
+        elif askc_type == 'ASKCFuse':
+            self.attention = ASKCFuse(channels=planes*4, r=16)
         else:
-            raise ValueError(askc_type + ' is unknown askc type')
+            raise ValueError('Unknown askc_type')
 
     def hybrid_forward(self, F, x):
 
@@ -181,7 +119,7 @@ class BottleneckV1bASKC(HybridBlock):
         return out
 
 
-class ResNeXtBlockASKC(HybridBlock):
+class AFFResNeXtBlock(HybridBlock):
     r"""Bottleneck Block from `"Aggregated Residual Transformations for Deep Neural Network"
     <http://arxiv.org/abs/1611.05431>`_ paper.
     Parameters
@@ -209,9 +147,9 @@ class ResNeXtBlockASKC(HybridBlock):
     """
 
     def __init__(self, askc_type, channels, cardinality, bottleneck_width, stride,
-                 downsample=False, last_gamma=False, use_se=False, avg_down=False,
+                 downsample=False, last_gamma=False, use_se=False, avg_down=True,
                  norm_layer=BatchNorm, norm_kwargs=None, **kwargs):
-        super(ResNeXtBlockASKC, self).__init__(**kwargs)
+        super(AFFResNeXtBlock, self).__init__(**kwargs)
         D = int(math.floor(channels * (bottleneck_width / 64)))
         group_width = cardinality * D
 
@@ -253,18 +191,14 @@ class ResNeXtBlockASKC(HybridBlock):
         else:
             self.downsample = None
 
-        if askc_type == 'ASKCFuse':
-            self.attention = ASKCFuse(channels=channels*4, r=16)
-        elif askc_type == 'ResGlobGlobCha':
-            self.attention = ResGlobGlobChaFuse(channels=channels*4, r=16)
-        elif askc_type == 'ResLocaLocaCha':
-            self.attention = ResLocaLocaChaFuse(channels=channels*4, r=16)
-        elif askc_type == 'DirectAdd':
+        if askc_type == 'DirectAdd':
             self.attention = DirectAddFuse()
         elif askc_type == 'ResGlobLocaforGlobLocaCha':
             self.attention = ResGlobLocaforGlobLocaChaFuse(channels=channels*4, r=16)
+        elif askc_type == 'ASKCFuse':
+            self.attention = ASKCFuse(channels=channels*4, r=16)
         else:
-            raise ValueError('unknown askc type')
+            raise ValueError('Unknown askc_type')
 
     def hybrid_forward(self, F, x):
         residual = x

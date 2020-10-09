@@ -7,21 +7,45 @@ MXNet/Gluon code for "Attentional Feature Fusion" <https://arxiv.org/abs/2009.14
 
 What's in this repo so far:
 
- * Code, trained models, and training logs for CIFAR-10, CIFAR-100, and ImageNet
- 
-To Do:
+ * Code, trained models, and training logs for CIFAR-100 and ImageNet
 
-* ResNeXt code needs to be able to automatically choose number of attentional layers to avoid manually setting 
-* ResNeXt47 on CIFAR-100 needs to re-run to see whether the accuracy could be higher
-* Run ImageNet experiments with a higher number of attentional layers and a deeper backbone
-* Rename the function name, e.g., ResNet110V2ASKC => ResNet20V2ASKC  
+**PS:**
+
+* If you are the reviewers of our submitted paper, please note that the accuracy of current implementation is a bit higher than the accuracy in the paper because it is a new implementation with a bag of tricks.
+* 如果您是我的学位论文评审专家，发现论文与这个 repo 的数字有些出入，那是因为在论文提交后我又将代码重新实现了一遍，添加了 AutoAugment、Label Smooting 这些些技巧，所以目前这个 repo 中的分类准确率会比论文中的数字高一些，还请见谅。
+
+**Change Logs:**
+
+* 2020-10-08: Re-implement the image classification code with a bag of tricks
+* 2020-09-29: Upload the image classification codes and trained models for the submitted paper
+
+**To Do:**
+
+* Running AFF-ResNeXt-50 and AFF-ResNet-50 on ImageNet
+* Re-implement the segmentation code
+* Convert to PyTorch
+
+**In Progress:**
+
+* Running iAFF-ResNeXt-50 on ImageNet
+
+**Done:**
+
+* Re-implement the image classification code with a bag of tricks
  
 ## Requirements
  
 Install [MXNet](https://mxnet.apache.org/) and [Gluon-CV](https://gluon-cv.mxnet.io/):
   
 ```
-pip install --upgrade mxnet-cu100 gluoncv
+pip install --upgrade mxnet-cu101 gluoncv
+```
+
+If you are going to use autoaugment:
+
+```
+python3 -m pip install --upgrade "mxnet_cu101<2.0.0"
+python3 -m pip install autogluon
 ```
 
 ## Experiments 
@@ -40,8 +64,8 @@ The training commands / shell scripts are in `cmd_scripts.txt`
 | PyramidNet-272-alpha-200 [[8]](#8)              | 26.0M    | 83.6        |
 | Neural Architecture Transfer (NAT-M4) [[9]](#9) | 9.0M     | 88.3        |
 | AutoAugment+PyramidNet+ShakeDrop [[10]](#10)    | 26.0M    | 89.3        |
-| **AFF-ResNet-32 (ours)**                        | **5.0M** | **89.3**    |
-| **AFF-ResNeXt-38-32x4d (ours)**                 | **7.8M** | **90.3**    |
+| **AFF-ResNeXt-38-32x4d (ours)**                 | **7.8M** | **91.2**    |
+| **AFF-ResNeXt-47-32x4d (ours)**                 | **9.7M** | **91.8**    |
 
 ###  ImageNet
 
@@ -53,10 +77,10 @@ The training commands / shell scripts are in `cmd_scripts.txt`
 | SENet-101 [[4]](#4)                             | 49.4M     | 20.9        |
 | Gather-Excite-$\theta^{+}$-ResNet-101 [[5]](#5) | 58.4M     | 20.7        |
 | Local-Importance-Pooling-ResNet-101 [[6]](#6)   | 42.9M     | 20.7        |
-| **AFF-ResNet-50 (ours)**                        | **30.3M** | **20.9**    |
-| **AFF-ResNeXt-50-32x4d (ours)**                 | **29.9M** | **20.8**    |
-| **iAFF-ResNet-50 (ours)**                       | **35.1M** | **20.4**    |
-| **iAFF-ResNeXt-50-32x4d (ours)**                | **34.7M** | **20.2**    |
+<!-- | **AFF-ResNet-50 (ours)**                        | **30.3M** | **20.9**    |
+| **AFF-ResNeXt-50-32x4d (ours)**                 | **29.9M** | **20.8**    | -->
+| **iAFF-ResNet-50 (ours)**                       | **35.1M** | **20.2**    |
+<!-- | **iAFF-ResNeXt-50-32x4d (ours)**                | **34.7M** | **19.8**    | -->
 
 <img src=https://raw.githubusercontent.com/YimianDai/imgbed/master/github/aff/Localization_Reduced.jpg width=100%>
 <img src=https://raw.githubusercontent.com/YimianDai/imgbed/master/github/aff/SmallObject_Reduced.jpg width=100%>
