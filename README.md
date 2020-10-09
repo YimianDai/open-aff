@@ -80,10 +80,11 @@ The training commands / shell scripts are in `cmd_scripts.txt`
 | Gather-Excite-$\theta^{+}$-ResNet-101 [[5]](#5) | 58.4M     | 20.7        |
 | Local-Importance-Pooling-ResNet-101 [[6]](#6)   | 42.9M     | 20.7        |
 | **iAFF-ResNet-50 (ours)**                       | **35.1M** | **20.2**    |
+| **iAFF-ResNeXt-50-32x4d (ours)**                | **34.7M** | **19.78**    |
 
-<!-- | **AFF-ResNet-50 (ours)**                        | **30.3M** | **20.9**    |
-| **AFF-ResNeXt-50-32x4d (ours)**                 | **29.9M** | **20.8**    | -->
-<!-- | **iAFF-ResNeXt-50-32x4d (ours)**                | **34.7M** | **19.8**    | -->
+<!-- | **AFF-ResNet-50 (ours)**                        | **30.3M** | **20.9**    | -->
+<!-- | **AFF-ResNeXt-50-32x4d (ours)**                 | **29.9M** | **20.8**    | -->
+
 
 <img src=https://raw.githubusercontent.com/YimianDai/imgbed/master/github/aff/Localization_Reduced.jpg width=100%>
 <img src=https://raw.githubusercontent.com/YimianDai/imgbed/master/github/aff/SmallObject_Reduced.jpg width=100%>
