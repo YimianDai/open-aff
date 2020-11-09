@@ -1,4 +1,4 @@
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/attentional-feature-fusion/image-classification-on-cifar-100)](https://paperswithcode.com/sota/image-classification-on-cifar-100?p=attentional-feature-fusion)
+<!-- [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/attentional-feature-fusion/image-classification-on-cifar-100)](https://paperswithcode.com/sota/image-classification-on-cifar-100?p=attentional-feature-fusion) -->
 
 Attentional Feature Fusion
 ==============
@@ -7,7 +7,8 @@ MXNet/Gluon code for "Attentional Feature Fusion" <https://arxiv.org/abs/2009.14
 
 What's in this repo so far:
 
- * Code, trained models, and training logs for CIFAR-100 and ImageNet
+<!--  * Code, trained models, and training logs for CIFAR-100 and ImageNet -->
+ * Code, trained models, and training logs for ImageNet
 
 **PS:**
 
@@ -55,7 +56,7 @@ All trained model params and training logs are in `./params`
 
 The training commands / shell scripts are in `cmd_scripts.txt`
 
-### CIFAR-100
+<!-- ### CIFAR-100
 
 | Architecture                                    | Params   | Accuracy    |
 | --------                                        | -------  | ----------- |
@@ -67,7 +68,7 @@ The training commands / shell scripts are in `cmd_scripts.txt`
 | AutoAugment+PyramidNet+ShakeDrop [[10]](#10)    | 26.0M    | 89.3     |
 | **AFF-ResNet-32**                               | **7.9M** | **90.8** |
 | **AFF-ResNeXt-38-32x4d (ours)**                 | **7.8M** | **91.2** |
-| **AFF-ResNeXt-47-32x4d (ours)**                 | **9.7M** | **91.8** |
+| **AFF-ResNeXt-47-32x4d (ours)**                 | **9.7M** | **91.8** | -->
 
 ###  ImageNet
 
