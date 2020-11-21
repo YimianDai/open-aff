@@ -91,6 +91,13 @@ The training commands / shell scripts are in `cmd_scripts.txt`
 <img src=https://raw.githubusercontent.com/YimianDai/imgbed/master/github/aff/Localization_Reduced.jpg width=100%>
 <img src=https://raw.githubusercontent.com/YimianDai/imgbed/master/github/aff/SmallObject_Reduced.jpg width=100%>
 
+
+## PyTorch Version
+
+@bobo0810 has contributed the PyTorch version. Please check the `aff_pytorch` directory for details. 
+
+Many thanks for @bobo0810 for his contribution. 
+
 ## Citation
 
 Please cite our paper in your publications if our work helps your research. BibTeX reference is as follows.
