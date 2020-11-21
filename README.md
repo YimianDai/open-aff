@@ -91,7 +91,18 @@ The training commands / shell scripts are in `cmd_scripts.txt`
 <img src=https://raw.githubusercontent.com/YimianDai/imgbed/master/github/aff/Localization_Reduced.jpg width=100%>
 <img src=https://raw.githubusercontent.com/YimianDai/imgbed/master/github/aff/SmallObject_Reduced.jpg width=100%>
 
+## Citation
 
+Please cite our paper in your publications if our work helps your research. BibTeX reference is as follows.
+
+```
+@inproceedings{dai21aff,
+  title   =  {Attentional Feature Fusion},
+  author  =  {Yimian Dai and Fabian Gieseke and Stefan Oehmcke and Yiquan Wu and Kobus Barnard},
+  booktitle =  {{IEEE} Winter Conference on Applications of Computer Vision, {WACV} 2021}
+  year    =  {2021}
+}
+```
 
 ## References
 
