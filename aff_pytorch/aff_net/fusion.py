@@ -71,7 +71,7 @@ class iAFF(nn.Module):
         xi = x * wei + residual * (1 - wei)
 
         xl2 = self.local_att2(xi)
-        xg2 = self.global_att(xi)
+        xg2 = self.global_att2(xi)
         xlg2 = xl2 + xg2
         wei2 = self.sigmoid(xlg2)
         xo = x * wei2 + residual * (1 - wei2)
